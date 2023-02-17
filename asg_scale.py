@@ -46,40 +46,6 @@ def get_asg_selection(auto_scaling_groups):
     return selected_asg, minimum_size, existing_desired_capacity, maximum_size
 
 
-def change_desired_capacity(client, selected_asg, minimum_size, existing_desired_capacity, maximum_size):
-    try:
-        new_desired_capacity = int(input('New desired capacity: '))
-        print()
-
-        if new_desired_capacity == existing_desired_capacity:
-            print("Already set")
-            exit()
-
-        if minimum_size > new_desired_capacity or new_desired_capacity > maximum_size:
-            print("Not within limits")
-            exit()
-
-    except ValueError:
-        print("Not an integer")
-        exit()
-
-    HonorCooldown = input("Honor Cooldown [Y/n]: ")
-
-    if HonorCooldown == "n":
-        HonorCooldown = False
-
-    else:
-        HonorCooldown = True
-
-    response = client.set_desired_capacity(
-        AutoScalingGroupName = selected_asg,
-        DesiredCapacity = new_desired_capacity,
-        HonorCooldown = HonorCooldown
-    )
-
-    return response
-
-
 def change_size(client, selected_asg, minimum_size, existing_desired_capacity, maximum_size):
     try:
         new_minimum_size = input('New minimum size [Blank = DEFAULT]: ')
@@ -132,13 +98,5 @@ if __name__ == '__main__':
     print_all_asg_groups(auto_scaling_groups)
     selected_asg, minimum_size, existing_desired_capacity, maximum_size = get_asg_selection(auto_scaling_groups)
 
-    selection = input("Do you want to change the Min and Max size [Y/n]: ")
-    print()
-
-    if selection == "n":
-        result = change_desired_capacity(client, selected_asg, minimum_size, existing_desired_capacity, maximum_size)
-        print(result)
-
-    else:
-        result = change_size(client, selected_asg, minimum_size, existing_desired_capacity, maximum_size)
-        print(result)
+    result = change_size(client, selected_asg, minimum_size, existing_desired_capacity, maximum_size)
+    print(result)
