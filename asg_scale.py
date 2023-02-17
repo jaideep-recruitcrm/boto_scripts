@@ -48,9 +48,9 @@ def get_asg_selection(auto_scaling_groups):
 
 def change_size(client, selected_asg, minimum_size, existing_desired_capacity, maximum_size):
     try:
-        new_minimum_size = input('New minimum size [Blank = DEFAULT]: ')
-        new_maximum_size = input('New maximum size [Blank = DEFAULT]: ')
-        new_desired_capacity = input('New desired capacity [Blank = DEFAULT]: ')
+        new_minimum_size = input(f'New minimum size [Blank = DEFAULT][{minimum_size}]: ')
+        new_maximum_size = input(f'New maximum size [Blank = DEFAULT][{maximum_size}]: ')
+        new_desired_capacity = input(f'New desired capacity [Blank = DEFAULT][{existing_desired_capacity}]: ')
         print()
 
         if len(new_minimum_size) == 0 and len(new_desired_capacity) == 0 and len(new_maximum_size) == 0:
