@@ -87,6 +87,10 @@ def change_size(client, selected_asg, minimum_size, existing_desired_capacity, m
         new_desired_capacity = input('New desired capacity [Blank = DEFAULT]: ')
         print()
 
+        if len(new_minimum_size) == 0 and len(new_desired_capacity) == 0 and len(new_maximum_size) == 0:
+            print("All default values")
+            exit()
+
         if len(new_minimum_size) == 0:
             new_minimum_size = minimum_size
         else:
@@ -102,9 +106,6 @@ def change_size(client, selected_asg, minimum_size, existing_desired_capacity, m
         else:
             new_desired_capacity = int(new_desired_capacity)
 
-        if len(new_minimum_size) == 0 and len(new_desired_capacity) == 0 and len(new_maximum_size) == 0:
-            print("All default values")
-            exit()
 
         if new_minimum_size > new_desired_capacity or new_desired_capacity > new_maximum_size:
             print("Not within limits")
