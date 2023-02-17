@@ -106,7 +106,6 @@ def change_size(client, selected_asg, minimum_size, existing_desired_capacity, m
         else:
             new_desired_capacity = int(new_desired_capacity)
 
-
         if new_minimum_size > new_desired_capacity or new_desired_capacity > new_maximum_size:
             print("Not within limits")
             exit()
