@@ -1,5 +1,14 @@
-a = input("enter number: ")
+import json
+import boto3
 
-b = int(a)
+# Extracting Json values
+region_name = 'ap-south-1'
+asg_name = 'test-asg'
+scale = 'up'
 
-print(b)
+# Boto3
+client = boto3.client('autoscaling', region_name=region_name)
+
+all_asg = client.describe_auto_scaling_groups()['AutoScalingGroups']
+
+print(all_asg)
