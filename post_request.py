@@ -9,17 +9,17 @@ def get_scale():
     return scale
 
 
-URL = 'redacted'
+url = ""
 if __name__ == '__main__':
     scale = get_scale()
 
-    data = {
-        'region_name': 'ap-south-1',
-        'instance_name': 'fluid-attack-security',
-        'asg_name': 'fluid-attack-asg',
-        'scale': scale
+    headers = {
+        'Content-Type': 'application/json'
     }
 
-    response = requests.post(URL, json=data)
-    print(f'Status Code: {response.status_code}')
-    print(json.loads(response._content))
+    payload = json.dumps({
+        "scale": scale
+    })
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    print(response.text)
