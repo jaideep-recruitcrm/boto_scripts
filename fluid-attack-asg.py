@@ -6,7 +6,6 @@ import boto3
 def extract_values(event):
     region_name = ''
     asg_name = ''
-    instance_name = ''
     
     if 'region_name' in event:
         region_name = event['region_name']
@@ -18,12 +17,7 @@ def extract_values(event):
     else:
         asg_name = 'fluid-attack-asg'
 
-    if 'instance_name' in event:
-        instance_name = event['instance_name']
-    else:
-        instance_name = 'fluid-attack-security'
-
-    return region_name, asg_name, instance_name
+    return region_name, asg_name
 
 
 def verify_asg_name(client, all_asg, asg_name):
@@ -80,27 +74,22 @@ def scale_asg(client, all_asg, asg_name, scale, minimum_size, current_desired_ca
             )['ResponseMetadata']['HTTPStatusCode']
 
 
-def get_ip_address(region_name, instance_name):
+def get_ip_address(region_name, asg_name):
+    ec2 = boto3.resource('ec2', region_name=region_name)
+
+    response= asg.describe_auto_scaling_groups(AutoScalingGroupNames=[asg_name])
+    groups=response.get("AutoScalingGroups")
+    instances=(groups[0].get('Instances'))
+
     ip_address = ''
-    while ip_address == '':
-        client = boto3.client('ec2', region_name=region_name)
-        instances_array = client.describe_instances()['Reservations']
-        for instance in instances_array:
-            for tag in instance['Instances'][0]['Tags']:
-                if tag['Key'] == 'Name' and tag['Value'] == instance_name:
-                    print(instance['Instances'][0])
-                    print('------')
-                    try:
-                        ip_address = instance['Instances'][0]['PublicDnsName']
-                    except:
-                        time.sleep(15)
-    return ip_address
+    for i in instances:
+        ip_address = ec2.Instance(i.get('InstanceId')).public_dns_name
 
 
 def lambda_handler(event, context):
     # Extracting Json values
     event = json.loads(event['body'])
-    region_name, asg_name, instance_name = extract_values(event)
+    region_name, asg_name = extract_values(event)
     scale = verify_scale_request(event['scale'])
 
     # Boto3
@@ -135,11 +124,11 @@ def lambda_handler(event, context):
             }
         elif status_code == 200:
             if scale == 'up':
-                ip_address = get_ip_address(region_name, instance_name)
+                ip_address = get_ip_address(region_name, asg_name)
 
                 response = {
                     'message': "Successfully scaled " + scale,
-                    'connection_string': 'ssh -i "katia.pem" ubuntu@' + ip_address
+                    'connection_string': 'ssh -i "katia.pem" ubuntu@' + pubip
                 }
                 return {
                     'statusCode': status_code,
