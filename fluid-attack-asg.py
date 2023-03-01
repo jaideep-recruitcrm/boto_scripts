@@ -146,16 +146,25 @@ def lambda_handler(event, context):
                 'body': json.dumps(response)
             }
         elif status_code == 200:
-            ip_address = get_ip_address(instance_name)
+            if scale == 'up':
+                ip_address = get_ip_address(instance_name)
 
-            response = {
-                'message': "Successfully scaled " + scale,
-                'connection_string': 'ssh -i "katia.pem" ubuntu@' + ip_address
-            }
-            return {
-                'statusCode': status_code,
-                'body': json.dumps(response)
-            }
+                response = {
+                    'message': "Successfully scaled " + scale,
+                    'connection_string': 'ssh -i "katia.pem" ubuntu@' + ip_address
+                }
+                return {
+                    'statusCode': status_code,
+                    'body': json.dumps(response)
+                }
+            else:
+                response = {
+                    'message': "Successfully scaled " + scale
+                }
+                return {
+                    'statusCode': status_code,
+                    'body': json.dumps(response)
+                }
         else:
             response = {
                 'message': "Unexpected response"
