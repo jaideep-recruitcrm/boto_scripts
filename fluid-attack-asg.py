@@ -130,7 +130,7 @@ def lambda_handler(event, context):
 
                 response = {
                     'message': "Successfully scaled " + scale,
-                    'connection_string': 'ssh -i "katia.pem" ubuntu@' + ip_address
+                    'connection_string': "ssh -i katia.pem ubuntu@' + ip_address
                 }
                 return {
                     'statusCode': status_code,
