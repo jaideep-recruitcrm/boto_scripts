@@ -74,16 +74,18 @@ def scale_asg(client, all_asg, asg_name, scale, minimum_size, current_desired_ca
             )['ResponseMetadata']['HTTPStatusCode']
 
 
-def get_ip_address(region_name, asg_name):
-    ec2 = boto3.resource('ec2', region_name=region_name)
+def get_ip_address(client, region_name, asg_name):
+    ec2 = boto3.resource('ec2')
 
-    response= asg.describe_auto_scaling_groups(AutoScalingGroupNames=[asg_name])
+    response= client.describe_auto_scaling_groups(AutoScalingGroupNames=[asg_name])
     groups=response.get("AutoScalingGroups")
     instances=(groups[0].get('Instances'))
 
     ip_address = ''
-    for i in instances:
-        ip_address = ec2.Instance(i.get('InstanceId')).public_dns_name
+    for instance in instances:
+        ip_address = ec2.Instance(instance.get('InstanceId')).public_dns_name
+        
+    return ip_address
 
 
 def lambda_handler(event, context):
@@ -124,11 +126,11 @@ def lambda_handler(event, context):
             }
         elif status_code == 200:
             if scale == 'up':
-                ip_address = get_ip_address(region_name, asg_name)
+                ip_address = get_ip_address(client, region_name, asg_name)
 
                 response = {
                     'message': "Successfully scaled " + scale,
-                    'connection_string': 'ssh -i "katia.pem" ubuntu@' + pubip
+                    'connection_string': 'ssh -i "katia.pem" ubuntu@' + ip_address
                 }
                 return {
                     'statusCode': status_code,
