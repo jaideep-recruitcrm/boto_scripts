@@ -77,7 +77,7 @@ def scale_asg(client, all_asg, asg_name, scale, minimum_size, current_desired_ca
 def get_ip_address(client, region_name, asg_name):
     ip_address = ''
     while ip_address == '':
-        time.sleep(30)
+        time.sleep(15)
         ec2 = boto3.resource('ec2')
         response= client.describe_auto_scaling_groups(AutoScalingGroupNames=[asg_name])
         groups=response.get("AutoScalingGroups")
