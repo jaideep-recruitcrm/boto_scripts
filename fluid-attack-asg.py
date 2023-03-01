@@ -61,7 +61,7 @@ def verify_scale_request(scale):
 
 def scale_asg(client, all_asg, asg_name, scale, minimum_size, current_desired_capacity, maximum_size):
     if scale == 'up':
-        if current_desired_capacity == 2:
+        if current_desired_capacity == 1:
             return 500
         else:
             return client.set_desired_capacity(
@@ -80,39 +80,27 @@ def scale_asg(client, all_asg, asg_name, scale, minimum_size, current_desired_ca
             )['ResponseMetadata']['HTTPStatusCode']
 
 
-def get_instances(client):
-    instances_array = client.describe_instances()['Reservations']
-    instances_name_array = []
-    for instance in instances_array:
-        for tag in instance['Instances'][0]['Tags']:
-            if tag['Key'] == 'Name':
-                instances_name_array.append(tag['Value'])
-
-    return instances_array, instances_name_array
-
-
 def get_ip_address(region_name, instance_name):
     ip_address = ''
-    client = boto3.client('ec2', region_name=region_name)
-
-    instances_array, instances_name_array = get_instances(client)
     while ip_address == '':
-        if instance_name in instances_name_array:
-            for instance in instances_array:
-                for tag in instance['Instances'][0]['Tags']:
-                    if tag['Key'] == 'Name' and tag['Value'] == instance_name:
-                        ip_address = instance['PublicDnsName']
-        else:
-            time.sleep(30)
-            instances_array, instances_name_array = get_instances(client)
-
+        client = boto3.client('ec2', region_name=region_name)
+        instances_array = client.describe_instances()['Reservations']
+        for instance in instances_array:
+            for tag in instance['Instances'][0]['Tags']:
+                if tag['Key'] == 'Name' and tag['Value'] == instance_name:
+                    print(instance['Instances'][0])
+                    print('------')
+                    try:
+                        ip_address = instance['Instances'][0]['PublicDnsName']
+                    except:
+                        time.sleep(15)
     return ip_address
 
 
 def lambda_handler(event, context):
     # Extracting Json values
     event = json.loads(event['body'])
-    region_name, asg_name, instance_name = extract_values(event['region_name'])
+    region_name, asg_name, instance_name = extract_values(event)
     scale = verify_scale_request(event['scale'])
 
     # Boto3
@@ -147,7 +135,7 @@ def lambda_handler(event, context):
             }
         elif status_code == 200:
             if scale == 'up':
-                ip_address = get_ip_address(instance_name)
+                ip_address = get_ip_address(region_name, instance_name)
 
                 response = {
                     'message': "Successfully scaled " + scale,
