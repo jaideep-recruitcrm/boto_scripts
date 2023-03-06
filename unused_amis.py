@@ -115,4 +115,4 @@ if __name__ == '__main__':
     count = 0
     for unused in all_unused:
         count += 1
-        print(f'{count}:\t {unused}')
+        print(f'{count}:\t{unused}')
