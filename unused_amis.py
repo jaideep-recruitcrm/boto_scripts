@@ -110,4 +110,9 @@ if __name__ == '__main__':
     print(f'All used AMIs: {len(all_used)}')
 
     all_unused = get_unused_amis(all_amis, all_used)
-    print(f'All unused AMIs: {len(all_unused)}')
+    print(f'All unused AMIs: {len(all_unused)}\n')
+
+    count = 0
+    for unused in all_unused:
+        count += 1
+        print(f'{count}:\t {unused}')
