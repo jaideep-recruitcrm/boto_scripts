@@ -9,7 +9,7 @@ def get_scale():
     return scale
 
 
-url = "https://4vclw563o53lfizgdupnyn5kse0frpku.lambda-url.ap-south-1.on.aws/"
+url = "https://ltsdzhuhvotvbv4yfe7d7b46wu0gvvyt.lambda-url.ap-south-1.on.aws/"
 if __name__ == '__main__':
     scale = get_scale()
 
