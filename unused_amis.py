@@ -49,6 +49,7 @@ def get_region_name():
     if region not in region_list:
         print("Invalid Region Code")
         exit()
+    print()
     return region
 
 
@@ -104,7 +105,7 @@ if __name__ == '__main__':
     ec2_client = boto3.client('ec2', region_name=region_name)
 
     all_amis = get_all_amis(ec2_client)
-    print("All AMIs: %d" % len(all_amis))
+    print(f"All AMIs: {len(all_amis)}")
 
     all_used = get_used_amis_by_instance(ec2_client)
     print(f'All used AMIs: {len(all_used)}')
